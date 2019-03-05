@@ -16,11 +16,13 @@ class ContatoDAO {
         $retorno = "";
         
         if ($conn != null) {
-            $sql = "INSERT INTO Contato (nome, telefone, email) VALUES ('" . $contato->getNome() . "', '" . $contato->getTelefone() . "', '" . $contato->getEmail() . "')";
-            if (!$conn->query($sql)) {
-                //$retorno = $conn->error;
+            $stmt = $conn->prepare("INSERT INTO Contato (nome, telefone, email) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $contato->getNome(), $contato->getTelefone(), $contato->getEmail());
+            if (!$stmt->execute()) {
+                //$retorno = $stmt->error;
                 $retorno = "erroSQL";
             }
+            $stmt->close();
             $conn->close();
         } else {
             $retorno = "erroCONN";
@@ -35,8 +37,10 @@ class ContatoDAO {
         $retorno = "";
         
         if ($conn != null) {
-            $sql = "SELECT * FROM Contato WHERE id = '" . $id . "'";
-            if ($resultado = $conn->query($sql)) {
+            $stmt = $conn->prepare("SELECT * FROM Contato WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) {
+                $resultado = $stmt->get_result();
                 if ($resultado->num_rows == 1) {
                     $l = $resultado->fetch_assoc();
                     $retorno = new Contato($l["id"], $l["nome"], $l["telefone"], $l["email"]);
@@ -44,9 +48,10 @@ class ContatoDAO {
                     $retorno = null;
                 }
             } else {
-                //$retorno = $conn->error;
+                //$retorno = $stmt->error;
                 $retorno = "erroSQL";
             }
+            $stmt->close();
             $conn->close();
         } else {
             $retorno = "erroCONN";
@@ -61,8 +66,11 @@ class ContatoDAO {
         $retorno = "";
         
         if ($conn != null) {
-            $sql = "SELECT * FROM Contato WHERE nome LIKE '%" . $nome . "%'";
-            if ($resultado = $conn->query($sql)) {
+            $stmt = $conn->prepare("SELECT * FROM Contato WHERE nome LIKE ?");
+            $parteNome = "%" . $nome . "%";
+            $stmt->bind_param("s", $parteNome);
+            if ($stmt->execute()) {
+                $resultado = $stmt->get_result();
                 if ($resultado->num_rows > 0) {
                     while($l = $resultado->fetch_assoc()) {
                         $contato[] = new Contato($l["id"], $l["nome"], $l["telefone"], $l["email"]);
@@ -72,9 +80,10 @@ class ContatoDAO {
                     $retorno = null;
                 }
             } else {
-                //$retorno = $conn->error;
-                $retorno = "erroSQL";
+                //$retorno = $stmt->error;
+                $retorno = "erroSQL"; 
             }
+            $stmt->close();
             $conn->close();
         } else {
             $retorno = "erroCONN";
@@ -89,8 +98,11 @@ class ContatoDAO {
         $retorno = "";
         
         if ($conn != null) {
-            $sql = "SELECT * FROM Contato WHERE telefone LIKE '%" . $telefone . "%'";
-            if ($resultado = $conn->query($sql)) {
+            $stmt = $conn->prepare("SELECT * FROM Contato WHERE telefone LIKE ?");
+            $parteTelefone = "%" . $telefone . "%";
+            $stmt->bind_param("s", $parteTelefone);
+            if ($stmt->execute()) {
+                $resultado = $stmt->get_result();
                 if ($resultado->num_rows > 0) {
                     while($l = $resultado->fetch_assoc()) {
                         $contato[] = new Contato($l["id"], $l["nome"], $l["telefone"], $l["email"]);
@@ -100,9 +112,10 @@ class ContatoDAO {
                     $retorno = null;
                 }
             } else {
-                //$retorno = $conn->error;
-                $retorno = "erroSQL";
+                //$retorno = $stmt->error;
+                $retorno = "erroSQL"; 
             }
+            $stmt->close();
             $conn->close();
         } else {
             $retorno = "erroCONN";
@@ -117,8 +130,11 @@ class ContatoDAO {
         $retorno = "";
         
         if ($conn != null) {
-            $sql = "SELECT * FROM Contato WHERE email LIKE '%" . $email . "%'";
-            if ($resultado = $conn->query($sql)) {
+            $stmt = $conn->prepare("SELECT * FROM Contato WHERE email LIKE ?");
+            $parteEmail = "%" . $email . "%";
+            $stmt->bind_param("s", $parteEmail);
+            if ($stmt->execute()) {
+                $resultado = $stmt->get_result();
                 if ($resultado->num_rows > 0) {
                     while($l = $resultado->fetch_assoc()) {
                         $contato[] = new Contato($l["id"], $l["nome"], $l["telefone"], $l["email"]);
@@ -128,9 +144,10 @@ class ContatoDAO {
                     $retorno = null;
                 }
             } else {
-                //$retorno = $conn->error;
-                $retorno = "erroSQL";
+                //$retorno = $stmt->error;
+                $retorno = "erroSQL"; 
             }
+            $stmt->close();
             $conn->close();
         } else {
             $retorno = "erroCONN";
@@ -145,8 +162,9 @@ class ContatoDAO {
         $retorno = "";
         
         if ($conn != null) {
-            $sql = "SELECT * FROM Contato";
-            if ($resultado = $conn->query($sql)) {
+            $stmt = $conn->prepare("SELECT * FROM Contato");
+            if ($stmt->execute()) {
+                $resultado = $stmt->get_result();
                 if ($resultado->num_rows > 0) {
                     while($l = $resultado->fetch_assoc()) {
                         $contato[] = new Contato($l["id"], $l["nome"], $l["telefone"], $l["email"]);
@@ -156,9 +174,10 @@ class ContatoDAO {
                     $retorno = null;
                 }
             } else {
-                //$retorno = $conn->error;
-                $retorno = "erroSQL";
+                //$retorno = $stmt->error;
+                $retorno = "erroSQL"; 
             }
+            $stmt->close();
             $conn->close();
         } else {
             $retorno = "erroCONN";
@@ -173,31 +192,37 @@ class ContatoDAO {
         $retorno = "";
         
         if ($conn != null) {
-            $sql = "UPDATE Contato SET ";
             if ($contato->getNome() != "" && $contato->getTelefone() != "" && $contato->getEmail() != "") {
-                $sql .= "nome = '" . $contato->getNome() . "', telefone = '" . $contato->getTelefone() . "', email = '" . $contato->getEmail() . "'";
+                $stmt = $conn->prepare("UPDATE Contato SET nome = ?, telefone = ?, email = ? WHERE id = ?");
+                $stmt->bind_param("sssi", $contato->getNome(), $contato->getTelefone(), $contato->getEmail(), $contato->getID());
             } elseif ($contato->getNome() != "" && $contato->getTelefone() != "") {
-                $sql .= "nome = '" . $contato->getNome() . "', telefone = '" . $contato->getTelefone() . "'";
+                $stmt = $conn->prepare("UPDATE Contato SET nome = ?, telefone = ? WHERE id = ?");
+                $stmt->bind_param("ssi", $contato->getNome(), $contato->getTelefone(), $contato->getID());
             } elseif ($contato->getNome() != "" && $contato->getEmail() != "") {
-                $sql .= "nome = '" . $contato->getNome() . "', email = '" . $contato->getEmail() . "'";
+                $stmt = $conn->prepare("UPDATE Contato SET nome = ?, email = ? WHERE id = ?");
+                $stmt->bind_param("ssi", $contato->getNome(), $contato->getEmail(), $contato->getID());
             } elseif ($contato->getTelefone() != "" && $contato->getEmail() != "") {
-                $sql .= "telefone = '" . $contato->getTelefone() . "', email = '" . $contato->getEmail() . "'";
-            } elseif ($contato->getNome()) {
-                $sql .= "nome = '" . $contato->getNome() . "'";
-            } elseif ($contato->getTelefone()) {
-                $sql .= "telefone = '" . $contato->getTelefone() . "'";
-            } elseif ($contato->getEmail()) {
-                $sql .= "email = '" . $contato->getEmail() . "'";
+                $stmt = $conn->prepare("UPDATE Contato SET telefone = ?, email = ? WHERE id = ?");
+                $stmt->bind_param("ssi", $contato->getTelefone(), $contato->getEmail(), $contato->getID());
+            } elseif ($contato->getNome() != "") {
+                $stmt = $conn->prepare("UPDATE Contato SET nome = ? WHERE id = ?");
+                $stmt->bind_param("si", $contato->getNome(), $contato->getID());
+            } elseif ($contato->getTelefone() != "") {
+                $stmt = $conn->prepare("UPDATE Contato SET telefone = ? WHERE id = ?");
+                $stmt->bind_param("si", $contato->getTelefone(), $contato->getID());
+            } elseif ($contato->getEmail() != "") {
+                $stmt = $conn->prepare("UPDATE Contato SET email = ? WHERE id = ?");
+                $stmt->bind_param("si", $contato->getEmail(), $contato->getID());
             }
-            $sql .= " WHERE id = '" . $contato->getID() . "'";
-            if ($conn->query($sql)) {
-                if ($conn->affected_rows == 0) {
+            if ($stmt->execute()) {
+                if ($stmt->affected_rows == 0) {
                     $retorno = "erroUP";
                 }
             } else {
-                //$retorno = $conn->error;
+                //$retorno = $stmt->error;
                 $retorno = "erroSQL";
             }
+            $stmt->close();
             $conn->close();
         } else {
             $retorno = "erroCONN";
@@ -212,15 +237,18 @@ class ContatoDAO {
         $retorno = "";
         
         if ($conn != null) {
-            $sql = "DELETE FROM Contato WHERE id = '" . $id . "'";
-            if ($conn->query($sql)) {
-                if ($conn->affected_rows == 0) {
+            $stmt = $conn->prepare("DELETE FROM Contato WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            
+            if ($stmt->execute()) {
+                if ($stmt->affected_rows == 0) {
                     $retorno = "erroDEL";
                 }
             } else {
-                //$retorno = $conn->error;
+                //$retorno = $stmt->error;
                 $retorno = "erroSQL";
             }
+            $stmt->close();
             $conn->close();
         } else {
             $retorno = "erroCONN";
