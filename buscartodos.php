@@ -22,9 +22,9 @@
                 error_reporting(E_ERROR | E_PARSE); // Para não mostrar erros/avisos do próprio PHP
                 
                 require_once 'Contato.php';
-                require_once 'ContatoDAO.php';
+                require_once 'ContatoDAOImpl.php';
                 
-                $cdao = new ContatoDAO();
+                $cdao = new ContatoDAOImpl();
                 $contatos = $cdao->buscarTodos();
                 print("<div class=\"row justify-content-center\"><div class=\"form-group col-xs-12 col-sm-12 col-md-8 col-lg-8 text-center\">
                         <h5><a href=\"index.html\" class=\"badge badge-pill badge-secondary text-center\">Voltar</a></h5><br>");

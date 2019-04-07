@@ -4,7 +4,6 @@
  *
  * @author iagocolodetti
  */
-
 class Contato {
     
     private $id,

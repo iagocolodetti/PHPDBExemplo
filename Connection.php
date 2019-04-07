@@ -4,7 +4,6 @@
  *
  * @author iagocolodetti
  */
-
 final class Connection {
     
     private static $host = "localhost",

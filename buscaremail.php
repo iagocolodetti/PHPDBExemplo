@@ -22,7 +22,7 @@
                 error_reporting(E_ERROR | E_PARSE); // Para não mostrar erros/avisos do próprio PHP
                 
                 require_once 'Contato.php';
-                require_once 'ContatoDAO.php';
+                require_once 'ContatoDAOImpl.php';
                 
                 $email = isset($_POST["email"]) ? $_POST["email"] : "";
                 
@@ -42,7 +42,7 @@
                 print("</form>");
                 
                 if ($email != "") {
-                    $cdao = new ContatoDAO();
+                    $cdao = new ContatoDAOImpl();
                     $contatos = $cdao->buscarPorEmail($email);
                     print("<div class=\"row justify-content-center\"><div class=\"form-group col-xs-12 col-sm-12 col-md-8 col-lg-8 text-center\">");
                     if ($contatos != null) {
